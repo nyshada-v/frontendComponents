@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-// import { createUserWithEmailAndPassword } from 'firebase/auth';
-// import { auth } from '../firebase/config';
+import { Link,useNavigate} from 'react-router-dom';
+import {auth,googleauthprovider} from "../firebase/config";
+import { createUserWithEmailAndPassword,signInWithPopup, signOut } from "firebase/auth";
 
 function Signup() {
   const [fullName, setFullName] = useState('');
@@ -10,14 +10,27 @@ function Signup() {
   const [password, setPassword] = useState('');
   const [agreed, setAgreed] = useState(false);
 
-  /* const handleSignup = async (e) => {
+  const navigate = useNavigate(); 
+  
+
+  const handleSignup = async (e) => {
     e.preventDefault();
     try {
       await createUserWithEmailAndPassword(auth, email, password);
+      navigate('/main');
     } catch (error) {
       console.error(error.message);
     }
-  }; */
+  }; 
+
+  const handleSignupwithGoogle=async (e)=>{
+    try{
+            await  signInWithPopup(auth,googleauthprovider);
+            navigate('/main');
+        }catch(err){
+            console.error(err);
+        }
+  }
 
   return (
     <div className="container d-flex flex-column align-items-center justify-content-center min-vh-100">
@@ -43,6 +56,12 @@ function Signup() {
 
         <h4 className="text-center mb-3">Join HopeForward</h4>
         <p className="text-center text-muted mb-4">Create your account to start making a difference</p>
+
+        <button className="btn btn-outline-secondary w-100 mb-2" onClick={handleSignupwithGoogle}>
+          <i className="bi bi-google me-2"></i> Continue with Google
+        </button>
+
+        <div className="text-center text-muted my-2" style={{ fontSize: '14px' }}>OR CONTINUE WITH EMAIL</div>
 
         <form>
           <div className="mb-3">
@@ -97,7 +116,7 @@ function Signup() {
             </label>
           </div>
 
-          <button className="btn btn-primary w-100 mb-3" disabled={!agreed}>
+          <button className="btn btn-primary w-100 mb-3" disabled={!agreed} onClick={handleSignup}>
             Create Account
           </button>
         </form>

@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-// import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-// import { auth } from '../firebase/config';
+import { Link,useNavigate} from 'react-router-dom';
+import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { auth } from '../firebase/config';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate(); 
 
-  /* const handleGoogleLogin = async () => {
+  const handleGoogleLogin = async () => {
     try {
       await signInWithPopup(auth, new GoogleAuthProvider());
+     
+      navigate('/main');
     } catch (error) {
       console.error(error.message);
+      
     }
   };
 
@@ -19,10 +23,13 @@ function Login() {
     e.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      
+      navigate('/main');
     } catch (error) {
       console.error(error.message);
+      
     }
-  }; */
+  };
 
   return (
     <div className="container d-flex flex-column align-items-center justify-content-center min-vh-100">
@@ -51,7 +58,7 @@ function Login() {
         <p className="text-center text-muted mb-4">Sign in to your HopeForward account</p>
 
         {/* Google Sign-in */}
-        <button className="btn btn-outline-secondary w-100 mb-2">
+        <button className="btn btn-outline-secondary w-100 mb-2" onClick={handleGoogleLogin}>
           <i className="bi bi-google me-2"></i> Continue with Google
         </button>
 
@@ -87,7 +94,7 @@ function Login() {
             <Link to="#" className="text-decoration-none" style={{ fontSize: '14px' }}>Forgot password?</Link>
           </div>
 
-          <button className="btn btn-success w-100 mb-3">Sign In</button>
+          <button className="btn btn-success w-100 mb-3" onClick={handleEmailLogin}>Sign In</button>
         </form>
 
         <p className="text-center text-muted" style={{ fontSize: '14px' }}>
