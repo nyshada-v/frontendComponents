@@ -1,37 +1,33 @@
-import { createContext, useEffect, useState, useContext } from 'react';
+import { createContext, useEffect, useState, useContext } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebase/config"; // ✅ Your Firebase config
 
-// Create the context
+// Create context
 const AuthContext = createContext();
 
-// This AuthProvider is used to wrap the app
+// Provider to wrap the app
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
+  const [loading, setLoading] = useState(true); // Prevent UI flicker
 
-  // 🔧 Simulate a fake logged-in user (for development only)
   useEffect(() => {
-    // This dummy user helps test the UI before Firebase is connected
-    const dummyUser = {
-      uid: 'dev-user-id',
-      email: 'dev@example.com',
-      displayName: 'Dev User',
-    };
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+      setLoading(false);
+    });
 
-    // Simulate async loading like Firebase does
-    const timeout = setTimeout(() => {
-      setCurrentUser(dummyUser);
-    }, 500);
-
-    return () => clearTimeout(timeout);
+    // Cleanup listener
+    return () => unsubscribe();
   }, []);
 
   return (
     <AuthContext.Provider value={{ currentUser }}>
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 }
 
-// Custom hook to use the auth context
+// Custom hook
 export function useAuth() {
   return useContext(AuthContext);
 }

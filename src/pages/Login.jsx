@@ -1,21 +1,25 @@
 import React, { useState } from 'react';
-import { Link,useNavigate} from 'react-router-dom';
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+  sendPasswordResetEmail
+} from 'firebase/auth';
 import { auth } from '../firebase/config';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const handleGoogleLogin = async () => {
     try {
       await signInWithPopup(auth, new GoogleAuthProvider());
-     
       navigate('/main');
     } catch (error) {
       console.error(error.message);
-      
+      alert("Google login failed: " + error.message);
     }
   };
 
@@ -23,11 +27,23 @@ function Login() {
     e.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      
       navigate('/main');
     } catch (error) {
       console.error(error.message);
-      
+      alert("Login failed: " + error.message);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    const emailPrompt = prompt("Please enter your registered email to reset password:");
+    if (!emailPrompt) return;
+
+    try {
+      await sendPasswordResetEmail(auth, emailPrompt);
+      alert("✅ Password reset email sent to " + emailPrompt);
+    } catch (error) {
+      console.error(error.message);
+      alert("❌ Failed to send reset email: " + error.message);
     }
   };
 
@@ -65,7 +81,7 @@ function Login() {
         <div className="text-center text-muted my-2" style={{ fontSize: '14px' }}>OR CONTINUE WITH EMAIL</div>
 
         {/* Login Form */}
-        <form>
+        <form onSubmit={handleEmailLogin}>
           <div className="mb-3">
             <label className="form-label">Email Address</label>
             <input
@@ -73,6 +89,7 @@ function Login() {
               className="form-control bg-light"
               placeholder="Enter your email"
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
 
@@ -83,6 +100,7 @@ function Login() {
               className="form-control bg-light"
               placeholder="Enter your password"
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
 
@@ -91,10 +109,17 @@ function Login() {
               <input className="form-check-input" type="checkbox" id="rememberMe" />
               <label className="form-check-label" htmlFor="rememberMe">Remember me</label>
             </div>
-            <Link to="#" className="text-decoration-none" style={{ fontSize: '14px' }}>Forgot password?</Link>
+            <button
+              type="button"
+              onClick={handleForgotPassword}
+              className="btn btn-link p-0 text-decoration-none"
+              style={{ fontSize: '14px' }}
+            >
+              Forgot password?
+            </button>
           </div>
 
-          <button className="btn btn-success w-100 mb-3" onClick={handleEmailLogin}>Sign In</button>
+          <button type="submit" className="btn btn-success w-100 mb-3">Sign In</button>
         </form>
 
         <p className="text-center text-muted" style={{ fontSize: '14px' }}>
